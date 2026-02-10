@@ -16,6 +16,7 @@ while !  ssh -p $SSHPORT $SSHUSER@$RHOST "echo >/dev/tcp/localhost/$RPORT" &>/de
  if [[ $i -eq $RETRY ]]; then
    break
  fi
+ sleep 2
 done
 
 if [[ $i -eq $RETRY ]]; then

@@ -1,0 +1,36 @@
+#!/bin/bash
+# XXXXXXXXXXXXXXX IMPORTANT XXXXXXXXXXXXXXXXXXXXX
+# Ensure passwordless login to remote host FIRST!
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Requires ~/log to exist on client
+#
+RPORT=3001 # a port you'd like to forward on remote host
+SSHUSER=your_ssh_username
+SSHPORT=22 # or any other port remote host accepts ssh connections at
+RHOST=remote_host_ip_address
+SSHPROG=/usr/bin/autossh # autossh preferred on client but ssh can also works
+
+RETRY=3
+while !  ssh -p $SSHPORT $SSHUSER@$RHOST "echo >/dev/tcp/localhost/$RPORT" &>/dev/null; do
+ ((i++))
+ if [[ $i -eq $RETRY ]]; then
+   break
+ fi
+done
+
+if [[ $i -eq $RETRY ]]; then
+ $SSHPROG -fNTR 127.0.0.1:$RPORT:localhost:22 -p $SSHPORT $SSHUSER@$RHOST
+ echo -n `date +'[%d%b%y %H:%M:%S]'`
+ echo "`basename $SSHPROG` tunnel setup localhost:$RPORT : OK" 
+ /bin/pidof `basename $SSHPROG` 
+ echo "pkill -3 ssh to stop"
+else
+ echo -n `date +'[%d%b%y %H:%M:%S]'`
+ echo "`basename $SSHPROG` tunnel already setup localhost:$RPORT" 
+ /bin/pidof `basename $SSHPROG` 
+ echo "pkill -3 ssh to stop"
+fi
+
+echo "rpi4b_tun0.4" 
+# crontab -e
+#*/1 * * * * ~/bin/rpi4b_tun0.4 > ~/log/tunnel.log 2>&1 

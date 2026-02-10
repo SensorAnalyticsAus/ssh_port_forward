@@ -3,3 +3,7 @@
 ssh -p 3001 localhost
 ````
 This allows a client with dynamic IP to become accesible through the remote host.
+
+<b>NB</b> 
+* ver 0.4 suits those with no sudo access on remote host
+* ver 0.3 requires `netcat` install
